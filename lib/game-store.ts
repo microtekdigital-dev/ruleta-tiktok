@@ -60,15 +60,17 @@ export function selectPrize(prizes: Prize[]): Prize {
 // Para que ese punto quede en 0° (arriba), necesitamos rotar: 90 - (i + 0.5) * segAngle
 export function calculateSpinAngle(prizeIndex: number, totalPrizes: number, startAngle: number = 0): number {
   const segmentAngle = 360 / totalPrizes
-  // El puntero esta arriba (en posicion 0 grados visual, que es -90 en el canvas)
-  // El segmento 0 comienza en -90 grados (arriba) y va en sentido horario
-  // Para que el centro del segmento i quede bajo el puntero:
-  // - El centro del segmento i esta en: i * segmentAngle + segmentAngle/2 grados desde el inicio
-  // - Necesitamos rotar la rueda para que ese centro quede en la posicion del puntero
-  // - Como la rueda rota en sentido horario con valores positivos, rotamos:
-  //   360 - (i * segmentAngle + segmentAngle/2) para alinear el centro con el puntero
-  const centerOfSegment = prizeIndex * segmentAngle + segmentAngle / 2
-  const targetRotation = ((360 - centerOfSegment) % 360 + 360) % 360
+  // El segmento 0 esta arriba cuando rotation = 0
+  // Cuando rotamos la rueda R grados (sentido horario positivo), la rueda se mueve hacia la derecha
+  // Por lo tanto, el segmento que queda bajo el puntero despues de rotar R es:
+  // visualIndex = floor((360 - R) / segAngle) mod n  (si R > 0)
+  // 
+  // Para que el segmento prizeIndex quede bajo el puntero, necesitamos:
+  // prizeIndex = floor((360 - targetRotation) / segAngle) mod n
+  // 
+  // Simplificando: targetRotation = 360 - (prizeIndex + 0.5) * segAngle
+  // (el +0.5 es para apuntar al centro del segmento)
+  const targetRotation = ((360 - (prizeIndex + 0.5) * segmentAngle) % 360 + 360) % 360
 
   const startNormalized = ((startAngle % 360) + 360) % 360
   let delta = targetRotation - startNormalized
@@ -80,7 +82,6 @@ export function calculateSpinAngle(prizeIndex: number, totalPrizes: number, star
     prizeIndex,
     totalPrizes,
     segmentAngle,
-    centerOfSegment,
     targetRotation,
     startAngle,
     startNormalized,

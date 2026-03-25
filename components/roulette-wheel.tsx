@@ -169,15 +169,13 @@ export function RouletteWheel({ prizes, isSpinning, targetAngle, currentResult, 
           setCurrentRotation(finalRotation)
           onRotationUpdate?.(finalRotation)
           const r = capturedResultRef.current
-          // El segmento 0 comienza arriba (en el puntero) cuando la rotacion es 0
-          // Cuando rotamos R grados en sentido horario, el segmento que estaba en posicion P
-          // ahora esta en posicion P - R (porque la rueda giro hacia adelante)
-          // Para saber que segmento esta bajo el puntero (posicion 0):
-          // Si la rueda roto R grados, el segmento bajo el puntero es el que estaba en posicion R
-          // visualIndex = floor(R / segmentAngle) mod n
+          // El segmento 0 esta arriba cuando rotation = 0
+          // Cuando rotamos R grados (sentido horario), la rueda gira a la derecha
+          // El segmento que queda bajo el puntero es:
+          // visualIndex = floor((360 - R) / segAngle) mod n
           const segAngle = 360 / prizes.length
           const normalizedRotation = ((finalRotation % 360) + 360) % 360
-          const visualIndex = Math.floor(normalizedRotation / segAngle) % prizes.length
+          const visualIndex = Math.floor(((360 - normalizedRotation) % 360 + 360) / segAngle) % prizes.length
           
           console.log("[v0] roulette spin complete:", {
             finalRotation,
