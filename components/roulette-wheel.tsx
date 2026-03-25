@@ -169,26 +169,19 @@ export function RouletteWheel({ prizes, isSpinning, targetAngle, currentResult, 
           setCurrentRotation(finalRotation)
           onRotationUpdate?.(finalRotation)
           const r = capturedResultRef.current
-          // La rueda: segmento i se dibuja desde (i * segAngle - 90°) hasta ((i+1) * segAngle - 90°)
-          // El puntero esta arriba (0° en pantalla = -90° en coordenadas del canvas)
-          // ctx.rotate(R) rota la rueda R grados en sentido horario
-          // Despues de rotar R, lo que estaba en angulo A ahora esta en angulo A + R
-          // El puntero (que apunta a -90° en coords canvas) ahora ve el angulo original: -90 - R
-          // Para saber que segmento esta bajo el puntero:
-          // Segmento i cubre angulos desde (i * segAngle - 90) hasta ((i+1) * segAngle - 90)
-          // El angulo bajo el puntero es: -90 - R (normalizado a [0, 360))
-          // Para encontrar i: angulo = i * segAngle - 90, entonces i = (angulo + 90) / segAngle
+          // El segmento 0 comienza arriba (en el puntero) cuando la rotacion es 0
+          // Cuando rotamos R grados en sentido horario, el segmento que estaba en posicion P
+          // ahora esta en posicion P - R (porque la rueda giro hacia adelante)
+          // Para saber que segmento esta bajo el puntero (posicion 0):
+          // Si la rueda roto R grados, el segmento bajo el puntero es el que estaba en posicion R
+          // visualIndex = floor(R / segmentAngle) mod n
           const segAngle = 360 / prizes.length
           const normalizedRotation = ((finalRotation % 360) + 360) % 360
-          // Angulo original que ahora esta bajo el puntero (en coords de la rueda sin rotar)
-          const angleUnderPointer = ((-90 - normalizedRotation) % 360 + 360) % 360
-          // Calcular el indice del segmento
-          const visualIndex = Math.floor(((angleUnderPointer + 90) % 360) / segAngle) % prizes.length
+          const visualIndex = Math.floor(normalizedRotation / segAngle) % prizes.length
           
           console.log("[v0] roulette spin complete:", {
             finalRotation,
             normalizedRotation,
-            angleUnderPointer,
             segAngle,
             visualIndex,
             expectedPrize: prizes[visualIndex]?.label,
