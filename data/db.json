@@ -1,0 +1,86 @@
+{
+  "leaderboard": [
+    {
+      "username": "GamerPro123",
+      "giftCount": 22
+    },
+    {
+      "username": "CoolCat77",
+      "giftCount": 21
+    },
+    {
+      "username": "HappyVibes",
+      "giftCount": 29
+    },
+    {
+      "username": "LuckyPlayer",
+      "giftCount": 65
+    },
+    {
+      "username": "MoonWalker",
+      "giftCount": 21
+    },
+    {
+      "username": "NightOwl22",
+      "giftCount": 36
+    },
+    {
+      "username": "StreamFan99",
+      "giftCount": 49
+    },
+    {
+      "username": "StarGazer",
+      "giftCount": 49
+    },
+    {
+      "username": "SunnyDay",
+      "giftCount": 25
+    },
+    {
+      "username": "TikTokStar",
+      "giftCount": 11
+    }
+  ],
+  "topFan": [
+    "TikTokStar",
+    "LuckyPlayer"
+  ],
+  "ranking": [
+    {
+      "username": "CoolCat77",
+      "points": 6
+    },
+    {
+      "username": "NightOwl22",
+      "points": 2
+    },
+    {
+      "username": "HappyVibes",
+      "points": 2
+    },
+    {
+      "username": "LuckyPlayer",
+      "points": 5
+    },
+    {
+      "username": "GamerPro123",
+      "points": 1
+    },
+    {
+      "username": "StreamFan99",
+      "points": 2
+    },
+    {
+      "username": "SunnyDay",
+      "points": 1
+    },
+    {
+      "username": "TikTokStar",
+      "points": 2
+    },
+    {
+      "username": "StarGazer",
+      "points": 2
+    }
+  ]
+}
