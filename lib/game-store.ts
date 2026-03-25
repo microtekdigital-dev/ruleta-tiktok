@@ -52,15 +52,26 @@ export function selectPrize(prizes: Prize[]): Prize {
 }
 
 // Calculate the rotation angle to land on a specific prize.
+// La rueda dibuja segmentos desde (i * segAngle - 90°) hasta ((i+1) * segAngle - 90°).
+// El puntero está en la parte superior (0°/top), que corresponde a -90° en coordenadas del canvas.
+// Para que el puntero apunte al CENTRO del segmento i, la rueda debe rotar de manera que
+// el centro del segmento i quede alineado con el puntero (arriba).
+// Centro del segmento i (en coordenadas locales de la rueda) = (i + 0.5) * segAngle - 90°
+// Para que ese punto quede en 0° (arriba), necesitamos rotar: 90 - (i + 0.5) * segAngle
 export function calculateSpinAngle(prizeIndex: number, totalPrizes: number, startAngle: number = 0): number {
   const segmentAngle = 360 / totalPrizes
-  const targetRotation = (((prizeIndex + 0.5) * segmentAngle) % 360 + 360) % 360
+  // Ángulo al que debe apuntar el centro del segmento ganador (respecto al puntero en top=0°)
+  // El segmento i tiene su centro en: (i + 0.5) * segAngle - 90° (en coords del canvas)
+  // Para alinear con el puntero (arriba), rotamos: -(centro del segmento en coords locales)
+  // = -((i + 0.5) * segAngle - 90) = 90 - (i + 0.5) * segAngle
+  const targetLocalAngle = 90 - (prizeIndex + 0.5) * segmentAngle
+  // Normalizar a [0, 360)
+  const targetRotation = ((targetLocalAngle % 360) + 360) % 360
 
   const startNormalized = ((startAngle % 360) + 360) % 360
   let delta = targetRotation - startNormalized
-  if (delta < 0) delta += 360
-  if (delta < 10) delta += 360
-
+  if (delta <= 0) delta += 360
+  // Asegurar que la rueda gire varias vueltas completas + el delta necesario
   return 8 * 360 + delta
 }
 

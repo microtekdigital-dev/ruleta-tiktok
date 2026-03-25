@@ -169,12 +169,21 @@ export function RouletteWheel({ prizes, isSpinning, targetAngle, currentResult, 
           setCurrentRotation(finalRotation)
           onRotationUpdate?.(finalRotation)
           const r = capturedResultRef.current
-          // Canvas draws segment i from i*segAngle-90° to (i+1)*segAngle-90°.
-          // Pointer is at 0° (top). With rotation R, pointer sees local angle -R.
-          // Segment containing local angle A: floor((A + 90) / segAngle) mod n
+          // La rueda dibuja el segmento i desde (i * segAngle - 90°) hasta ((i+1) * segAngle - 90°).
+          // El puntero está en la parte superior (top = 0°).
+          // Después de rotar R grados, el punto que originalmente estaba en ángulo A ahora está en A + R.
+          // El puntero (arriba = 0°) ahora apunta al ángulo local: -R (o 360 - R normalizado).
+          // Para encontrar qué segmento está bajo el puntero:
+          // El segmento i cubre desde (i * segAngle - 90°) hasta ((i+1) * segAngle - 90°).
+          // Si el ángulo local bajo el puntero es L = (-R mod 360), entonces:
+          // L está en el segmento i si: i * segAngle - 90 <= L < (i+1) * segAngle - 90
+          // Reordenando: i = floor((L + 90) / segAngle)
           const segAngle = 360 / prizes.length
-          const localAngle = ((-finalRotation + 90) % 360 + 360) % 360
-          const visualIndex = Math.floor(localAngle / segAngle) % prizes.length
+          const normalizedRotation = ((finalRotation % 360) + 360) % 360
+          // El ángulo local que está bajo el puntero (arriba)
+          const localAngleUnderPointer = ((360 - normalizedRotation) % 360 + 360) % 360
+          // Calcular el índice del segmento
+          const visualIndex = Math.floor(((localAngleUnderPointer + 90) % 360) / segAngle) % prizes.length
           onSpinComplete(r?.prize.label ?? '', r?.prize.emoji ?? '', r?.username ?? '', visualIndex)
         }
       }
