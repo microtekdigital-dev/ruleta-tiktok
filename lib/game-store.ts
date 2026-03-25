@@ -60,14 +60,15 @@ export function selectPrize(prizes: Prize[]): Prize {
 // Para que ese punto quede en 0° (arriba), necesitamos rotar: 90 - (i + 0.5) * segAngle
 export function calculateSpinAngle(prizeIndex: number, totalPrizes: number, startAngle: number = 0): number {
   const segmentAngle = 360 / totalPrizes
-  // La rueda rota en sentido horario (valores positivos de rotacion).
-  // Segmento i esta dibujado desde angulo (i * segAngle - 90) hasta ((i+1) * segAngle - 90).
-  // El puntero esta arriba (en 0 grados / top).
-  // Cuando la rueda tiene rotacion R, el angulo local bajo el puntero es: -R (mod 360)
-  // Queremos que -R caiga en el centro del segmento i: centro = (i + 0.5) * segAngle - 90
-  // Entonces: -R = (i + 0.5) * segAngle - 90 (mod 360)
-  // R = 90 - (i + 0.5) * segAngle (mod 360)
-  const targetRotation = ((90 - (prizeIndex + 0.5) * segmentAngle) % 360 + 360) % 360
+  // La rueda: segmento i se dibuja desde (i * segAngle - 90°) hasta ((i+1) * segAngle - 90°)
+  // El puntero esta en -90° (arriba en el canvas)
+  // Despues de rotar R grados, el angulo original bajo el puntero es: -90 - R
+  // Queremos que -90 - R caiga en el centro del segmento i
+  // Centro del segmento i = (i + 0.5) * segAngle - 90
+  // Entonces: -90 - R = (i + 0.5) * segAngle - 90
+  // Despejando: R = -(i + 0.5) * segAngle
+  // Normalizado a positivo: R = 360 - (i + 0.5) * segAngle (mod 360)
+  const targetRotation = ((-(prizeIndex + 0.5) * segmentAngle) % 360 + 360) % 360
 
   const startNormalized = ((startAngle % 360) + 360) % 360
   let delta = targetRotation - startNormalized

@@ -169,30 +169,26 @@ export function RouletteWheel({ prizes, isSpinning, targetAngle, currentResult, 
           setCurrentRotation(finalRotation)
           onRotationUpdate?.(finalRotation)
           const r = capturedResultRef.current
-          // La rueda dibuja el segmento i desde (i * segAngle - 90°) hasta ((i+1) * segAngle - 90°).
-          // El puntero está en la parte superior (top = 0°).
-          // Después de rotar R grados, el punto que originalmente estaba en ángulo A ahora está en A + R.
-          // El puntero (arriba = 0°) ahora apunta al ángulo local: -R (o 360 - R normalizado).
-          // Para encontrar qué segmento está bajo el puntero:
-          // El segmento i cubre desde (i * segAngle - 90°) hasta ((i+1) * segAngle - 90°).
-          // Si el ángulo local bajo el puntero es L = (-R mod 360), entonces:
-          // L está en el segmento i si: i * segAngle - 90 <= L < (i+1) * segAngle - 90
-          // Reordenando: i = floor((L + 90) / segAngle)
+          // La rueda: segmento i se dibuja desde (i * segAngle - 90°) hasta ((i+1) * segAngle - 90°)
+          // El puntero esta arriba (0° en pantalla = -90° en coordenadas del canvas)
+          // ctx.rotate(R) rota la rueda R grados en sentido horario
+          // Despues de rotar R, lo que estaba en angulo A ahora esta en angulo A + R
+          // El puntero (que apunta a -90° en coords canvas) ahora ve el angulo original: -90 - R
+          // Para saber que segmento esta bajo el puntero:
+          // Segmento i cubre angulos desde (i * segAngle - 90) hasta ((i+1) * segAngle - 90)
+          // El angulo bajo el puntero es: -90 - R (normalizado a [0, 360))
+          // Para encontrar i: angulo = i * segAngle - 90, entonces i = (angulo + 90) / segAngle
           const segAngle = 360 / prizes.length
           const normalizedRotation = ((finalRotation % 360) + 360) % 360
-          // El ángulo local que está bajo el puntero (arriba)
-          // Cuando rotamos R grados, el punto que estaba en angulo A ahora esta en A + R
-          // El puntero (arriba = 0) ve el angulo local: -R (o equivalente 360-R)
-          const localAngleUnderPointer = ((360 - normalizedRotation) % 360 + 360) % 360
-          // Segmento i cubre desde (i * segAngle - 90) hasta ((i+1) * segAngle - 90)
-          // Si localAngle = L, esta en segmento i si: i*segAngle - 90 <= L < (i+1)*segAngle - 90
-          // Despejando: i = floor((L + 90) / segAngle)
-          const visualIndex = Math.floor(((localAngleUnderPointer + 90) % 360) / segAngle) % prizes.length
+          // Angulo original que ahora esta bajo el puntero (en coords de la rueda sin rotar)
+          const angleUnderPointer = ((-90 - normalizedRotation) % 360 + 360) % 360
+          // Calcular el indice del segmento
+          const visualIndex = Math.floor(((angleUnderPointer + 90) % 360) / segAngle) % prizes.length
           
           console.log("[v0] roulette spin complete:", {
             finalRotation,
             normalizedRotation,
-            localAngleUnderPointer,
+            angleUnderPointer,
             segAngle,
             visualIndex,
             expectedPrize: prizes[visualIndex]?.label,
