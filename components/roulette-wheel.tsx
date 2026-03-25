@@ -181,9 +181,24 @@ export function RouletteWheel({ prizes, isSpinning, targetAngle, currentResult, 
           const segAngle = 360 / prizes.length
           const normalizedRotation = ((finalRotation % 360) + 360) % 360
           // El ángulo local que está bajo el puntero (arriba)
+          // Cuando rotamos R grados, el punto que estaba en angulo A ahora esta en A + R
+          // El puntero (arriba = 0) ve el angulo local: -R (o equivalente 360-R)
           const localAngleUnderPointer = ((360 - normalizedRotation) % 360 + 360) % 360
-          // Calcular el índice del segmento
+          // Segmento i cubre desde (i * segAngle - 90) hasta ((i+1) * segAngle - 90)
+          // Si localAngle = L, esta en segmento i si: i*segAngle - 90 <= L < (i+1)*segAngle - 90
+          // Despejando: i = floor((L + 90) / segAngle)
           const visualIndex = Math.floor(((localAngleUnderPointer + 90) % 360) / segAngle) % prizes.length
+          
+          console.log("[v0] roulette spin complete:", {
+            finalRotation,
+            normalizedRotation,
+            localAngleUnderPointer,
+            segAngle,
+            visualIndex,
+            expectedPrize: prizes[visualIndex]?.label,
+            resultPrize: r?.prize.label
+          })
+          
           onSpinComplete(r?.prize.label ?? '', r?.prize.emoji ?? '', r?.username ?? '', visualIndex)
         }
       }
